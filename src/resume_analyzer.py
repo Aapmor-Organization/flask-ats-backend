@@ -194,14 +194,44 @@ Please format your entire response as valid JSON with the exact field names abov
         # Inject current date
         current_date = datetime.now().strftime("%B %Y")  # e.g., "May 2025"
 
+#         evaluation_prompt = f"""
+# You are an expert in evaluating professional experience from resumes.
+
+# Below is a list of job roles extracted from a candidate's resume. For any duration that mentions "present", "current", or similar, use today's date: **{current_date}** as the end date.
+
+# Analyze the positions, their durations, and work done in each role. Then:
+# - Calculate total experience in years (with 1 decimal)
+# - Calculate years of experience that are relevant to this job description (with 1 decimal)
+
+# Only return a JSON object in this format:
+# {{
+#   "total_experience_years": <decimal>,
+#   "relevant_experience_years": <decimal>
+# }}
+
+# Resume Experience:
+# {json.dumps(extracted_data.get("experience", []), indent=2)}
+
+# Job Description:
+# {job_description}
+# """
+
         evaluation_prompt = f"""
 You are an expert in evaluating professional experience from resumes.
 
 Below is a list of job roles extracted from a candidate's resume. For any duration that mentions "present", "current", or similar, use today's date: **{current_date}** as the end date.
 
+**Important Rules for Experience Calculation:**
+1. Parse all job start and end dates accurately, normalizing them to a consistent format (e.g., YYYY-MM).
+2. When calculating total experience, merge overlapping periods so that no month is counted more than once.
+3. Count only actual worked time; do not guess for missing dates — ignore roles without valid date ranges.
+4. Round experience results to **1 decimal place** in years.
+5. For relevant experience, count only the periods that match the skills, responsibilities, or technologies in the given Job Description, also avoiding any double-counting from overlapping periods.
+6. If two relevant jobs overlap, merge those periods before summing to avoid inflation.
+
 Analyze the positions, their durations, and work done in each role. Then:
-- Calculate total experience in years (with 1 decimal)
-- Calculate years of experience that are relevant to this job description (with 1 decimal)
+- Calculate total unique experience in years (1 decimal)
+- Calculate relevant unique experience in years (1 decimal) according to the Job Description
 
 Only return a JSON object in this format:
 {{
@@ -218,7 +248,7 @@ Job Description:
 
         try:
             response = self.client.chat.completions.create(
-                model="gpt-4o",
+                model="gpt-5-mini",
                 messages=[
                     {
                         "role": "system",
