@@ -49,12 +49,14 @@ Return JSON with: candidate_name, Email, Phone, highest_education, skills, exper
         
         try:
             response = self.client.chat.completions.create(
-                model="gpt-3.5-turbo",
+                # model="gpt-3.5-turbo",
+                model="gpt-4.1-mini",
+
                 messages=[
                     {"role": "system", "content": "Extract resume information as JSON."},
                     {"role": "user", "content": simple_prompt}
                 ],
-                temperature=0
+                # temperature=0
             )
             
             if response.choices and response.choices[0].message.content:
@@ -108,6 +110,7 @@ Please format your entire response as valid JSON with the exact field names abov
 
         try:
             # Try different models in order of preference
+            # models_to_try = ["gpt-4o-mini", "gpt-4", "gpt-3.5-turbo"]
             models_to_try = ["gpt-4o-mini", "gpt-4", "gpt-3.5-turbo"]
             
             for model in models_to_try:
@@ -123,7 +126,7 @@ Please format your entire response as valid JSON with the exact field names abov
                             {"role": "user", "content": extraction_prompt}
                         ],
                         response_format={"type": "json_object"} if model in ["gpt-4o", "gpt-4o-mini"] else None,
-                        temperature=0.1
+                        # temperature=0.1
                     )
                     
                     # Check if this model worked

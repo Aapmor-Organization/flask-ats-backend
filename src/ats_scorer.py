@@ -92,13 +92,13 @@ class ATSScorer:
             #     temperature=0.0  # Setting temperature to 0 for maximum determinism
             # )
             response = self.client.chat.completions.create(
-                model="gpt-5",
+                model="gpt-4o",
                 messages=[
                     {"role": "system", "content": "You are a precise ATS scoring system that evaluates resumes against job descriptions with complete determinism. You must output valid JSON with only the exact field names requested: overall_match_percentage, skills_match_percentage, experience_match_percentage, education_match_percentage, matched_skills, missing_skills."},
                     {"role": "user", "content": ats_prompt}
                 ],
                 response_format={"type": "json_object"},
-                temperature=0.0  # Setting temperature to 0 for maximum determinism
+                # temperature=0.0  # Setting temperature to 0 for maximum determinism
             )
             
             # Parse the response JSON
